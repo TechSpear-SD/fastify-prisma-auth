@@ -1,18 +1,20 @@
 services:
-    api:
-        build: .
-        ports:
-            - '3000:3000'
-        env_file: .env
-        depends_on:
-            - db
+    # api:
+    #     build: .
+    #     ports:
+    #         - '3000:3000'
+    #     env_file: .env
+    #     depends_on:
+    #         - db
     db:
-        image: postgres:16
+        image: postgres:18
         environment:
             POSTGRES_USER: user
             POSTGRES_PASSWORD: password
-            POSTGRES_DB: mydb
+            POSTGRES_DB: fpauthdb
         volumes:
-            - db_data:/var/lib/postgresql/data
+            - db_data:/var/lib/postgresql
+        ports:
+            - '5432:5432'
 volumes:
     db_data:

@@ -8,11 +8,10 @@
         "build": "npx tsc",
         "start": "node dist/index.js",
         "dev": "nodemon src/index.ts",
-        "migrate": "prisma migrate deploy",
-        "generate": "prisma generate",
         "lint": "eslint . --ext .ts",
         "lint:fix": "eslint . --ext .ts --fix",
         "format": "prettier --write .",
+        "format:check": "prettier --check .",
         "prepare": "husky install"
     },
     "keywords": [
@@ -29,6 +28,7 @@
     "type": "module",
     "dependencies": {
         "@prisma/client": "^6.18.0",
+        "dotenv": "^17.2.3",
         "fastify": "^5.6.1"
     },
     "devDependencies": {

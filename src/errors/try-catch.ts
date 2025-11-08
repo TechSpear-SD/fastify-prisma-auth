@@ -1,4 +1,5 @@
 import { CustomError } from './custom-error';
+import { ErrorCodes } from './error-codes';
 
 type CatchHandler = (err: any) => never | void;
 
@@ -25,8 +26,15 @@ export async function tryCatch<T>(fn: () => Promise<T>, catchHandler?: CatchHand
             }
         }
 
-        throw new CustomError('Unexpected internal error', 500, false, undefined, {
-            originalError: err,
-        });
+        throw new CustomError(
+            'Unexpected internal error',
+            500,
+            ErrorCodes.INTERNAL_SERVER_ERROR,
+            false,
+            undefined,
+            {
+                originalError: err,
+            }
+        );
     }
 }

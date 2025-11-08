@@ -1,5 +1,8 @@
+import { ErrorCodes } from './error-codes';
+
 export class CustomError extends Error {
     public readonly statusCode: number;
+    public readonly code: ErrorCodes;
     public readonly isOperational: boolean;
     public readonly details?: Record<string, any>;
     public readonly debugInfo?: Record<string, any>;
@@ -7,6 +10,7 @@ export class CustomError extends Error {
     constructor(
         message: string,
         statusCode: number = 500,
+        code: ErrorCodes = ErrorCodes.INTERNAL_SERVER_ERROR,
         isOperational: boolean = true,
         details?: Record<string, any>,
         debugInfo?: Record<string, any>
@@ -15,6 +19,7 @@ export class CustomError extends Error {
 
         this.name = this.constructor.name;
         this.statusCode = statusCode;
+        this.code = code;
         this.isOperational = isOperational;
         this.details = details;
         this.debugInfo = debugInfo;

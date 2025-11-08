@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client';
 import { DatabaseError } from '../database-error';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/binary';
 

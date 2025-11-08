@@ -24,7 +24,7 @@ export class ErrorHandler {
             return this.sendResponse(error);
         }
 
-        return this.sendInternalError();
+        return this.sendUnknownError();
     }
 
     private logError(error: FastifyError) {
@@ -57,12 +57,13 @@ export class ErrorHandler {
     private sendResponse(error: CustomError) {
         return this.reply.status(error.statusCode).send({
             status: error.statusCode,
+            code: error.code,
             message: error.message,
             details: error.details,
         });
     }
 
-    private sendInternalError() {
+    private sendUnknownError() {
         return this.reply.status(500).send({
             status: 500,
             code: 'INTERNAL_ERROR',

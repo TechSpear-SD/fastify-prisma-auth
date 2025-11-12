@@ -1,10 +1,15 @@
+import type { FastifyInstance } from 'fastify';
+
 import { prismaPlugin } from './prisma';
 import { authPlugin } from './auth';
-import type { FastifyInstance } from 'fastify';
 import { corsPlugin } from './cors';
+import { correlationPlugin } from './correlation-plugin';
+import { configPlugin } from './config';
 
-export async function registerPlugins(app: FastifyInstance) {
+export async function registerGlobalPlugins(app: FastifyInstance) {
     await app.register(corsPlugin);
     await app.register(prismaPlugin);
     await app.register(authPlugin);
+    await app.register(correlationPlugin);
+    await app.register(configPlugin);
 }

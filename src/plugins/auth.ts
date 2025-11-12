@@ -1,8 +1,9 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import type { FastifyInstance } from 'fastify';
-import { prisma } from './prisma';
 import fp from 'fastify-plugin';
+
+import { prisma } from './prisma';
 
 export const authPlugin = fp(async (fastify: FastifyInstance) => {
     const auth = betterAuth({

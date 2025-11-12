@@ -1,7 +1,7 @@
 import { CustomError } from './custom-error';
 import { ErrorCodes } from './error-codes';
 
-type CatchHandler = (err: any) => never | void;
+type CatchHandler = (err: unknown) => never | void;
 
 /**
  * A utility function that wraps asynchronous operations in a try-catch block.
@@ -16,7 +16,7 @@ type CatchHandler = (err: any) => never | void;
 export async function tryCatch<T>(fn: () => Promise<T>, catchHandler?: CatchHandler): Promise<T> {
     try {
         return await fn();
-    } catch (err: any) {
+    } catch (err: unknown) {
         if (err instanceof CustomError) throw err;
 
         if (catchHandler) {

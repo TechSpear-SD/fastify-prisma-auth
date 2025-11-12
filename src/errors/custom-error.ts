@@ -4,16 +4,16 @@ export class CustomError extends Error {
     public readonly statusCode: number;
     public readonly code: ErrorCodes;
     public readonly isOperational: boolean;
-    public readonly details?: Record<string, any>;
-    public readonly debugInfo?: Record<string, any>;
+    public readonly details?: Record<string, unknown>;
+    public readonly debugInfo?: Record<string, unknown>;
 
     constructor(
         message: string,
         statusCode: number = 500,
         code: ErrorCodes = ErrorCodes.INTERNAL_SERVER_ERROR,
         isOperational: boolean = true,
-        details?: Record<string, any>,
-        debugInfo?: Record<string, any>
+        details?: Record<string, unknown>,
+        debugInfo?: Record<string, unknown>
     ) {
         super(message);
 

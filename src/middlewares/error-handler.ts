@@ -1,4 +1,5 @@
 import type { FastifyError, FastifyReply, FastifyRequest } from 'fastify';
+
 import { CustomError } from '../errors/custom-error';
 
 export async function errorHandler(

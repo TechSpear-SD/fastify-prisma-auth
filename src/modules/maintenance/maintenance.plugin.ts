@@ -1,25 +1,37 @@
 import fp from 'fastify-plugin';
 import type { FastifyInstance } from 'fastify';
 import { MaintenanceError } from '../../errors/maintenance-error';
+import type { MaintenancePluginOptions } from '.';
 
 interface MaintenanceState {
     enabled: boolean;
     startTime: Date | null;
 }
 
-export default fp(async (app: FastifyInstance, opts: any) => {
+/**
+ * Maintenance mode plugin to handle maintenance state and requests.
+ * @param app Fastify instance
+ * @param opts Plugin options
+ */
+export default fp(async (app: FastifyInstance, opts: MaintenancePluginOptions) => {
     const state: MaintenanceState = { enabled: false, startTime: null };
 
     app.decorate('maintenance', state);
 
-    app.addHook('onRequest', async (req, reply) => {
-        if (req.url.startsWith('/maintenance')) return;
+    app.addHook('onRequest', async (req, _) => {
+        if (req.url.startsWith('/maintenance') || isIgnoredRoute(req.url, opts.ignoreRoutes)) {
+            return;
+        }
 
         if (app.maintenance.enabled) {
             throw new MaintenanceError();
         }
     });
 });
+
+const isIgnoredRoute = (url: string, ignoreRoutes?: string[]) => {
+    return ignoreRoutes?.some((route) => url.startsWith(route));
+};
 
 declare module 'fastify' {
     interface FastifyInstance {

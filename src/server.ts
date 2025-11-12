@@ -1,4 +1,4 @@
-import Fastify from 'fastify';
+import Fastify, { fastify } from 'fastify';
 
 import { registerGlobalPlugins } from './plugins';
 import { registerModules } from './modules';
@@ -15,6 +15,8 @@ export async function buildApp() {
     await registerModules(app);
 
     await app.ready();
+
+    app.log.info(app.printRoutes());
 
     return app;
 }

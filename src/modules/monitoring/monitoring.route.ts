@@ -1,17 +1,21 @@
-import packageJson from '../../../package.json';
+import { createMonitoringService } from './monitoring.service';
 
 export default async function monitoringRoutes(fastify: any) {
-    fastify.get('/', async () => {
-        return {
-            uptime: process.uptime(),
-            memoryUsage: process.memoryUsage(),
-            status: 'OK',
-        };
+    const service = createMonitoringService(fastify);
+
+    fastify.get('/health', async () => {
+        return service.health();
     });
 
     fastify.get('/version', async () => {
+        return service.version();
+    });
+
+    fastify.get('/', async () => {
         return {
-            version: packageJson.version || '0.0.0',
+            uptime: await service.getUptime(),
+            memoryUsage: process.memoryUsage(),
+            status: 'OK',
         };
     });
 }

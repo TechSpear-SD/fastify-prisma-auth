@@ -18,4 +18,10 @@ export default async function monitoringRoutes(fastify: any) {
             status: 'OK',
         };
     });
+
+    fastify.get('/ping', async () => {
+        return {
+            message: 'pong',
+        };
+    });
 }

@@ -9,7 +9,7 @@ import { asyncLocalStorage } from '../utils/context';
  * This ID is stored in an AsyncLocalStorage context and added to the request logger for traceability.
  */
 export const correlationPlugin = fp(async (fastify) => {
-    fastify.addHook('onRequest', (req, reply, done) => {
+    fastify.addHook('onRequest', (req, _, done) => {
         const correlationId = req.headers['x-correlation-id']?.toString() || randomUUID();
 
         asyncLocalStorage.run({ correlationId }, () => {

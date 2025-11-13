@@ -1,6 +1,9 @@
 import type { FastifyError, FastifyReply, FastifyRequest } from 'fastify';
 
 import { CustomError } from '../errors/custom-error';
+import { prismaCatchHandler } from '../errors/catch-handlers/prisma-error-handler';
+
+const CATCH_HANDLERS = [prismaCatchHandler];
 
 export async function errorHandler(
     error: FastifyError,
@@ -8,7 +11,7 @@ export async function errorHandler(
     reply: FastifyReply
 ) {
     const handler = new ErrorHandler(request, reply);
-    return handler.handle(error);
+    await handler.handle(error);
 }
 
 export class ErrorHandler {
@@ -17,7 +20,8 @@ export class ErrorHandler {
         private reply: FastifyReply
     ) {}
 
-    public handle(error: FastifyError) {
+    public async handle(error: FastifyError) {
+        error = await this.handleKnownCatches(error);
         this.logError(error);
         this.alertIfCritical(error);
 
@@ -26,6 +30,16 @@ export class ErrorHandler {
         }
 
         return this.sendUnknownError();
+    }
+
+    private async handleKnownCatches(error: FastifyError): Promise<FastifyError | CustomError> {
+        for (const handler of CATCH_HANDLERS) {
+            const handledError = await handler(error);
+            if (handledError !== undefined) {
+                return handledError;
+            }
+        }
+        return error;
     }
 
     private logError(error: FastifyError) {

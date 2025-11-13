@@ -1,17 +1,55 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/binary';
 
 import { DatabaseError } from '../database-error';
+import type { CustomError } from '../custom-error';
+import z from 'zod';
+
+const prismaErrorSchema = z.object({
+    name: z.string(),
+    code: z.string(),
+    message: z.string(),
+});
 
 /**
- * Transforme une erreur Prisma en DatabaseError opérationnelle
+ * Transforms Prisma known request errors into DatabaseError instances.
+ *
+ * @param err - The error to handle.
+ * @throws DatabaseError if the error is a PrismaClientKnownRequestError.
  */
-export function prismaCatchHandler(err: unknown) {
-    if (err instanceof PrismaClientKnownRequestError) {
-        throw new DatabaseError(
-            'Database constraint error',
+export function prismaCatchHandler(err: unknown): CustomError | undefined {
+    const parseResult = prismaErrorSchema.safeParse(err);
+
+    if (parseResult.success) {
+        const parsedError = parseResult.data;
+
+        if (parsedError.code === 'P1017') {
+            return new DatabaseError(
+                'Database constraint error',
+                undefined,
+                {
+                    originalError: {
+                        name: parsedError.name,
+                        code: parsedError.code,
+                        message: parsedError.message,
+                    },
+                },
+                true
+            );
+        }
+
+        return new DatabaseError(
+            'Database error',
             undefined,
-            { originalError: err.message },
+            {
+                originalError: {
+                    name: parsedError.name,
+                    code: parsedError.code,
+                    message: parsedError.message,
+                },
+            },
             true
         );
     }
+
+    return undefined;
 }

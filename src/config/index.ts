@@ -16,6 +16,6 @@ if (!parsed.success) {
     process.exit(1);
 }
 
-export const config = parsed.data;
+export const config = { ...parsed.data, isProduction: parsed.data.NODE_ENV === 'prod' };
 
 export type Config = typeof config;

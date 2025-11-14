@@ -2,11 +2,13 @@ import type { FastifyInstance } from 'fastify';
 
 import { monitoringModule } from './monitoring';
 import { maintenanceModule } from './maintenance';
+import { authModule } from './auth';
 
 export async function registerModules(fastify: FastifyInstance) {
     fastify.register(maintenanceModule, {
-        prefix: '/maintenance',
-        ignoreRoutes: ['/monitoring/health', '/monitoring/version'],
+        prefix: '/api/maintenance',
+        ignoreRoutes: ['/api/monitoring/health', '/api/monitoring/version'],
     });
-    fastify.register(monitoringModule, { prefix: '/monitoring' });
+    fastify.register(monitoringModule, { prefix: '/api/monitoring' });
+    fastify.register(authModule, { prefix: '/api/auth' });
 }

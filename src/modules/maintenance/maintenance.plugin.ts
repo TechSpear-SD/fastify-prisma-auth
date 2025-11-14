@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin';
 import type { FastifyInstance } from 'fastify';
 import { MaintenanceError } from '../../errors/maintenance-error';
-import type { MaintenancePluginOptions } from '.';
+import { DEFAULT_MODULE_PREFIX, type MaintenancePluginOptions } from '.';
 
 interface MaintenanceState {
     enabled: boolean;
@@ -19,7 +19,10 @@ export default fp(async (app: FastifyInstance, opts: MaintenancePluginOptions) =
     app.decorate('maintenance', state);
 
     app.addHook('onRequest', async (req, _) => {
-        if (req.url.startsWith('/maintenance') || isIgnoredRoute(req.url, opts.ignoreRoutes)) {
+        if (
+            req.url.startsWith(opts.prefix ?? DEFAULT_MODULE_PREFIX) ||
+            isIgnoredRoute(req.url, opts.ignoreRoutes)
+        ) {
             return;
         }
 

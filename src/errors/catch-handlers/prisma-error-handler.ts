@@ -14,7 +14,7 @@ const prismaErrorSchema = z.object({
  * Transforms Prisma known request errors into DatabaseError instances.
  *
  * @param err - The error to handle.
- * @throws DatabaseError if the error is a PrismaClientKnownRequestError.
+ * @returns A DatabaseError if the error matches known Prisma errors, otherwise undefined.
  */
 export function prismaCatchHandler(err: unknown): CustomError | undefined {
     const parseResult = prismaErrorSchema.safeParse(err);
@@ -36,19 +36,6 @@ export function prismaCatchHandler(err: unknown): CustomError | undefined {
                 true
             );
         }
-
-        return new DatabaseError(
-            'Database error',
-            undefined,
-            {
-                originalError: {
-                    name: parsedError.name,
-                    code: parsedError.code,
-                    message: parsedError.message,
-                },
-            },
-            true
-        );
     }
 
     return undefined;

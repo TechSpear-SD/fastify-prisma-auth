@@ -1,11 +1,11 @@
 meta {
-  name: /monitoring
+  name: accounts
   type: http
-  seq: 1
+  seq: 9
 }
 
 get {
-  url: {{baseUrl}}/api/monitoring
+  url: {{baseUrl}}/api/auth/list-accounts
   body: none
   auth: inherit
 }

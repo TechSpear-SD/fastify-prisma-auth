@@ -1,11 +1,11 @@
 meta {
-  name: /monitoring
+  name: get session
   type: http
-  seq: 1
+  seq: 2
 }
 
 get {
-  url: {{baseUrl}}/api/monitoring
+  url: {{baseUrl}}/api/auth/get-session
   body: none
   auth: inherit
 }

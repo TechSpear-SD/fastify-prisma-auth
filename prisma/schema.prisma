@@ -1,14 +1,16 @@
-
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
   output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["core", "authz", "audit"]
 }
 
+// CORE
+  
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -20,7 +22,13 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  // Modules relations
+  memberships   RoleMembership[]
+  organizationMemberships OrganizationMembership[]
+  auditLogs     AccessAuditLog[]
+
   @@map("user")
+  @@schema("core")
 }
 
 model Session {
@@ -36,6 +44,7 @@ model Session {
 
   @@unique([token])
   @@map("session")
+  @@schema("core")
 }
 
 model Account {
@@ -55,6 +64,7 @@ model Account {
   updatedAt             DateTime  @updatedAt
 
   @@map("account")
+  @@schema("core")
 }
 
 model Verification {
@@ -66,4 +76,138 @@ model Verification {
   updatedAt  DateTime @default(now()) @updatedAt
 
   @@map("verification")
+  @@schema("core")
+}
+
+//AUTHZ
+// ORGANIZATIONS / TENANTS
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  // relations
+  users       OrganizationMembership[]
+  roles       Role[]
+  roleMemberships RoleMembership[]
+
+  @@schema("authz")
+}
+
+// Relation between users and organizations
+model OrganizationMembership {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String
+  meta           Json?
+
+  user         User         @relation(fields: [userId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+  
+  @@unique([userId, organizationId])
+  @@schema("authz")
+}
+
+// RBAC (roles, permissions, policies)
+model Role {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  organizationId String?   // null => global role
+  createdAt   DateTime @default(now())
+  permissions RolePermission[]
+  memberships RoleMembership[]  // users that have this role
+  
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  parentRoles RoleInherit[] @relation("ParentRole")
+  childRoles RoleInherit[] @relation("ChildRole")
+
+  @@schema("authz")
+}
+
+// Relation for role inheritance (role hierarchy)
+model RoleInherit {
+  id        String @id @default(cuid())
+  parentId  String
+  childId   String
+
+  parent Role @relation("ParentRole", fields:[parentId], references:[id])
+  child  Role @relation("ChildRole", fields:[childId], references:[id])
+
+  @@unique([parentId, childId])
+  @@schema("authz")
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  action      String   // e.g. "invoice.create", "order.update"
+  resource    String?  // optional resource type (ex: "invoice")
+  description String?
+  createdAt   DateTime @default(now())
+
+  rolePermissions RolePermission[]
+
+  @@schema("authz")
+}
+
+model Policy {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  definition  Json     // JSONLogic / CEL style definition
+  organizationId String? // null => global policy
+  createdAt   DateTime @default(now())
+
+  rolePermissions RolePermission[]
+
+  @@schema("authz")
+}
+
+// Junction table for Role-Permission with optional Policy constraint
+model RolePermission {
+  id           String   @id @default(cuid())
+  roleId       String
+  permissionId String
+  policyId     String?   // optional policy constraint
+
+  role       Role        @relation(fields:[roleId], references:[id])
+  permission Permission  @relation(fields:[permissionId], references:[id])
+  policy     Policy?     @relation(fields:[policyId], references:[id])
+
+  @@unique([roleId, permissionId])
+  @@schema("authz")
+}
+
+// Relation between users and roles
+model RoleMembership {
+  id             String @id @default(cuid())
+  userId         String
+  roleId         String
+  organizationId String? // scope for this role membership, optional
+  meta           Json?
+  assignedAt     DateTime @default(now())
+
+  user User @relation(fields:[userId], references:[id])
+  role Role @relation(fields:[roleId], references:[id])
+  organization Organization? @relation(fields:[organizationId], references:[id])
+
+  @@unique([userId, roleId, organizationId])
+  @@schema("authz")
+}
+
+model AccessAuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  resource   String?
+  resourceId String?
+  allowed    Boolean
+  context    Json?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields:[userId], references:[id])
+
+  @@schema("audit")
 }

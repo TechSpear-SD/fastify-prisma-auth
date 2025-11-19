@@ -5,10 +5,9 @@ import { registerModules } from './modules';
 import { errorHandler } from './middlewares/error-handler';
 import { loggerOptions } from './config/correlation-logger';
 import { configPlugin } from './plugins/config';
-import type { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
 
 export async function buildApp() {
-    const app = Fastify({ logger: loggerOptions }).withTypeProvider<JsonSchemaToTsProvider>();
+    const app = Fastify({ logger: loggerOptions });
     app.register(configPlugin); // Load config first
 
     await registerGlobalPlugins(app);

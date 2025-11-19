@@ -5,7 +5,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
   schemas  = ["core", "authz", "audit"]
 }
 
@@ -153,6 +152,7 @@ model Permission {
 
   rolePermissions RolePermission[]
 
+  @@unique([action, resource])
   @@schema("authz")
 }
 

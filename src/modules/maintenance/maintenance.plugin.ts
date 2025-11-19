@@ -1,4 +1,3 @@
-import fp from 'fastify-plugin';
 import type { FastifyInstance } from 'fastify';
 import { MaintenanceError } from '../../errors/maintenance-error';
 import { DEFAULT_MODULE_PREFIX, type MaintenancePluginOptions } from '.';
@@ -13,7 +12,10 @@ interface MaintenanceState {
  * @param app Fastify instance
  * @param opts Plugin options
  */
-export default fp(async (app: FastifyInstance, opts: MaintenancePluginOptions) => {
+export default async function maintenancePlugin(
+    app: FastifyInstance,
+    opts: MaintenancePluginOptions
+) {
     const state: MaintenanceState = { enabled: false, startTime: null };
 
     app.decorate('maintenance', state);
@@ -30,7 +32,7 @@ export default fp(async (app: FastifyInstance, opts: MaintenancePluginOptions) =
             throw new MaintenanceError();
         }
     });
-});
+}
 
 const isIgnoredRoute = (url: string, ignoreRoutes?: string[]) => {
     return ignoreRoutes?.some((route) => url.startsWith(route));

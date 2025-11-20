@@ -5,12 +5,9 @@ import {
     type PostMaintenanceBody,
     type PostMaintenanceReply,
 } from './dto/post-maintenance-state.dto';
-import type { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
 
 export default async function maintenanceRoutes(fastify: FastifyInstance) {
-    const app = fastify.withTypeProvider<JsonSchemaToTsProvider>();
-
-    app.post<{
+    fastify.post<{
         Body: PostMaintenanceBody;
         Reply: PostMaintenanceReply;
     }>(

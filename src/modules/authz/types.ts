@@ -5,6 +5,7 @@ export enum Permissions {
 
 export interface AuthzModuleOptions {
     prefix?: string;
+    adminPrefix?: string;
 }
 
 export type AuthContext = {

@@ -139,14 +139,14 @@ model RoleInherit {
   @@schema("authz")
 }
 
+// This table's content should not be changed on runtime, only via migrations
 model Permission {
   id          String   @id @default(cuid())
   
   // We dont use a prisma enum but a typescript enum to allow more dynamic permissions   
   // without needing to migrate the database each time a new permission is added
-  action      String    // e.g. "invoice.create", "order.update"
-
-  resource    String?  // optional resource type (ex: "invoice")
+  action      String
+  resource    String
   description String?
   createdAt   DateTime @default(now())
 

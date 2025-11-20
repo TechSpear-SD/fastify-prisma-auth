@@ -1,11 +1,10 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import type { FastifyInstance } from 'fastify';
-import { prisma } from '../../plugins/prisma';
 
 export default async function authPlugin(fastify: FastifyInstance) {
     const auth = betterAuth({
-        database: prismaAdapter(prisma, {
+        database: prismaAdapter(fastify.prisma, {
             provider: 'postgresql',
         }),
         appName: fastify.config.APP_NAME,
@@ -20,7 +19,7 @@ export default async function authPlugin(fastify: FastifyInstance) {
             autoSignInAfterSignUp: true,
             sendResetPassword: async ({ user, url, token }) => {
                 fastify.log.info(
-                    `Send reset password email to ${user.email}: ${url} (token: ${token})`
+                    `TOOD : Send reset password email to ${user.email}: ${url} (token: ${token})`
                 );
             },
         },
@@ -33,7 +32,7 @@ export default async function authPlugin(fastify: FastifyInstance) {
         emailVerification: {
             sendVerificationEmail: async ({ user, url, token }) => {
                 fastify.log.info(
-                    `Send verification email to ${user.email}: ${url} (token: ${token})`
+                    `TODO : Send verification email to ${user.email}: ${url} (token: ${token})`
                 );
             },
             sendOnSignUp: true,

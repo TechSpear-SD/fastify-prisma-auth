@@ -97,7 +97,7 @@ model Organization {
 
 // Relation between users and organizations
 model OrganizationMembership {
-  id             String   @id @default(cuid())
+  id             String   @id
   userId         String
   organizationId String
   meta           Json?
@@ -111,7 +111,7 @@ model OrganizationMembership {
 
 // RBAC (roles, permissions, policies)
 model Role {
-  id          String   @id @default(cuid())
+  id          String   @id
   name        String
   description String?
   organizationId String?   // null => global role
@@ -128,7 +128,7 @@ model Role {
 
 // Relation for role inheritance (role hierarchy)
 model RoleInherit {
-  id        String @id @default(cuid())
+  id        String @id
   parentId  String
   childId   String
 
@@ -141,7 +141,7 @@ model RoleInherit {
 
 // This table's content should not be changed on runtime, only via migrations
 model Permission {
-  id          String   @id @default(cuid())
+  id          String   @id
   
   // We dont use a prisma enum but a typescript enum to allow more dynamic permissions   
   // without needing to migrate the database each time a new permission is added
@@ -157,7 +157,7 @@ model Permission {
 }
 
 model Policy {
-  id          String   @id @default(cuid())
+  id          String   @id
   name        String
   description String?
   definition  Json     // JSONLogic / CEL style definition
@@ -172,7 +172,7 @@ model Policy {
 
 // Junction table for Role-Permission with optional Policy constraint
 model RolePermission {
-  id           String   @id @default(cuid())
+  id           String   @id
   roleId       String
   permissionId String
   policyId     String?   // optional policy constraint
@@ -187,7 +187,7 @@ model RolePermission {
 
 // Relation between users and roles
 model RoleMembership {
-  id             String @id @default(cuid())
+  id             String @id
   userId         String
   roleId         String
   organizationId String? // scope for this role membership, optional
@@ -203,7 +203,7 @@ model RoleMembership {
 }
 
 model AccessAuditLog {
-  id         String   @id @default(cuid())
+  id         String   @id
   userId     String?
   action     String
   resource   String?

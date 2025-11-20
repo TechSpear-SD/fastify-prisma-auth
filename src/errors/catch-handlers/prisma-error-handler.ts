@@ -1,5 +1,3 @@
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/binary';
-
 import { DatabaseError } from '../database-error';
 import type { CustomError } from '../custom-error';
 import z from 'zod';

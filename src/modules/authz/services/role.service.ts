@@ -12,4 +12,30 @@ export const createRoleService = (fastify: FastifyInstance) => ({
             },
         });
     },
+
+    getRoleByIdOrThrow: async (roleId: number) => {
+        return fastify.prisma.role.findUniqueOrThrow({
+            where: {
+                id: roleId,
+            },
+        });
+    },
+
+    createRole: async (organizationId: string, name: string, description: string) => {
+        return fastify.prisma.role.create({
+            data: {
+                name,
+                description,
+                organizationId,
+            },
+        });
+    },
+
+    deleteRole: async (roleId: number) => {
+        await fastify.prisma.role.delete({
+            where: {
+                id: roleId,
+            },
+        });
+    },
 });

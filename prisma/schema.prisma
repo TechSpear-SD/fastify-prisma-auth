@@ -114,7 +114,7 @@ model Role {
   id          Int   @id @default(autoincrement())
   organizationId String
   name        String
-  description String?
+  description String
   createdAt   DateTime @default(now())
   permissions RolePermission[]
   memberships RoleMembership[]  // users that have this role

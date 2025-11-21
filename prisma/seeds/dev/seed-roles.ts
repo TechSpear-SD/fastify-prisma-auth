@@ -1,24 +1,21 @@
 import { PrismaClient, Role } from '../../../src/generated/prisma/client';
 import { GLOBAL_ORG_ID } from './seed-organization';
 
-const roles: Omit<Role, 'id'>[] = [
+const roles: Omit<Role, 'id' | 'createdAt'>[] = [
     {
         name: 'ADMIN',
         description: 'Administrator with full access',
         organizationId: GLOBAL_ORG_ID,
-        createdAt: new Date(),
     },
     {
         name: 'MODERATOR',
         description: 'Moderator with elevated access',
         organizationId: GLOBAL_ORG_ID,
-        createdAt: new Date(),
     },
     {
         name: 'USER',
         description: 'Regular user with limited access',
         organizationId: GLOBAL_ORG_ID,
-        createdAt: new Date(),
     },
 ];
 

@@ -5,11 +5,16 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/authz/roles
+  url: {{baseUrl}}/api/authz/roles?organizationId={{globalOrgId}}
   body: none
   auth: inherit
 }
 
+params:query {
+  organizationId: {{globalOrgId}}
+}
+
 settings {
   encodeUrl: true
+  timeout: 0
 }

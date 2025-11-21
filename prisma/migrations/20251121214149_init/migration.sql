@@ -91,7 +91,7 @@ CREATE TABLE "authz"."Role" (
     "id" SERIAL NOT NULL,
     "organizationId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "description" TEXT,
+    "description" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Role_pkey" PRIMARY KEY ("id")

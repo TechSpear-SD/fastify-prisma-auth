@@ -1,14 +1,13 @@
 import { CustomError } from './custom-error';
 import { ErrorCodes } from './error-codes';
 
-export class DatabaseError extends CustomError {
+export class ValidationError extends CustomError {
     constructor(
-        message = 'Database error',
-        errorCode: ErrorCodes = ErrorCodes.DATABASE_ERROR,
+        message = 'Validation error occurred',
         details?: Record<string, unknown>,
         debugInfo?: Record<string, unknown>,
         isOperational = true
     ) {
-        super(message, 400, errorCode, isOperational, details, debugInfo);
+        super(message, 400, ErrorCodes.VALIDATION, isOperational, details, debugInfo);
     }
 }

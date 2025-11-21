@@ -38,4 +38,16 @@ export const createRoleService = (fastify: FastifyInstance) => ({
             },
         });
     },
+
+    patchRole: async (roleId: number, name?: string, description?: string) => {
+        return fastify.prisma.role.update({
+            where: {
+                id: roleId,
+            },
+            data: {
+                name,
+                description,
+            },
+        });
+    },
 });

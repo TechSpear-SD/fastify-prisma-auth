@@ -24,6 +24,15 @@ import {
     type GetRoleByIdRequestParams,
 } from '../dto/roles/getRoleById.dto';
 
+import {
+    patchRoleRequestBodySchema,
+    patchRoleRequestParamsSchema,
+    patchRoleResponseSchema204,
+    type PatchRoleReply,
+    type PatchRoleRequestBody,
+    type PatchRoleRequestParams,
+} from '../dto/roles/patchRole';
+
 export async function rolesRoutes(fastify: FastifyInstance) {
     // Get all roles for an organization
     fastify.get<{ Querystring: GetRolesQueryString; Reply: GetRolesReply }>(
@@ -109,19 +118,36 @@ export async function rolesRoutes(fastify: FastifyInstance) {
             });
         }
     );
+
+    // Patch a role
+    fastify.patch<{
+        Params: PatchRoleRequestParams;
+        Body: PatchRoleRequestBody;
+        Reply: PatchRoleReply;
+    }>(
+        '/roles/:roleId',
+        {
+            schema: {
+                params: patchRoleRequestParamsSchema,
+                body: patchRoleRequestBodySchema,
+                response: {
+                    204: patchRoleResponseSchema204,
+                },
+            },
+        },
+        async (request, reply) => {
+            const { roleId } = request.params;
+            const { name, description } = request.body;
+
+            await fastify.authz.roles.patchRole(roleId, name, description);
+
+            return reply.code(204).send();
+        }
+    );
 }
 
 /**
  * 
-GET /roles – Liste tous les rôles d’une organisation donnée. : OK
-
-POST /roles – Crée un nouveau rôle pour une organisation. : OK
-
-GET /roles/:roleId – Récupère les détails d’un rôle.
-
-PATCH /roles/:roleId – Met à jour un rôle.
-
-DELETE /roles/:roleId – Supprime un rôle. : OK
 
 Role Membership (gestion des utilisateurs assignés au rôle)
 

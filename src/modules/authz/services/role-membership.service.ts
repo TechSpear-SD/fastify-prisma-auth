@@ -28,4 +28,15 @@ export const createRoleMembershipService = (fastify: FastifyInstance) => ({
             },
         });
     },
+
+    deleteRoleMembership: async (roleId: number, userId: string) => {
+        await fastify.prisma.roleMembership.delete({
+            where: {
+                userId_roleId: {
+                    userId,
+                    roleId,
+                },
+            },
+        });
+    },
 });

@@ -46,6 +46,12 @@ import {
     type PostRoleMembershipRequestBody,
     type PostRoleMembershipRequestParams,
 } from '../dto/roles/add-role-membership';
+import {
+    deleteRoleMembershipRequestParamsSchema,
+    deleteRoleMembershipResponseSchema204,
+    type deleteRoleMembershipReply,
+    type deleteRoleMembershipRequestParams,
+} from '../dto/roles/delete-role-membership';
 
 export async function rolesRoutes(fastify: FastifyInstance) {
     // Get all roles for an organization
@@ -204,6 +210,23 @@ export async function rolesRoutes(fastify: FastifyInstance) {
             await fastify.authz.roleMemberships.createRoleMembership(roleId, userId);
 
             return reply.code(201).send();
+        }
+    );
+
+    fastify.delete<{ Params: deleteRoleMembershipRequestParams; Reply: deleteRoleMembershipReply }>(
+        '/roles/:roleId/members/:userId',
+        {
+            schema: {
+                params: deleteRoleMembershipRequestParamsSchema,
+                response: { 204: deleteRoleMembershipResponseSchema204 },
+            },
+        },
+        async (request, reply) => {
+            const { roleId, userId } = request.params as { roleId: number; userId: string };
+
+            await fastify.authz.roleMemberships.deleteRoleMembership(roleId, userId);
+
+            return reply.code(204).send();
         }
     );
 }

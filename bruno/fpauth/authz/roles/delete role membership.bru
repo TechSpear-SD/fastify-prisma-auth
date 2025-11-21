@@ -1,0 +1,20 @@
+meta {
+  name: delete role membership
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{baseUrl}}/api/authz/roles/:roleId/members/:userid
+  body: none
+  auth: inherit
+}
+
+params:path {
+  roleId: 
+  userid: 
+}
+
+settings {
+  encodeUrl: true
+}

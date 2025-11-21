@@ -78,7 +78,7 @@ CREATE TABLE "authz"."Organization" (
 
 -- CreateTable
 CREATE TABLE "authz"."OrganizationMembership" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "userId" TEXT NOT NULL,
     "organizationId" TEXT NOT NULL,
     "meta" JSONB,
@@ -88,10 +88,10 @@ CREATE TABLE "authz"."OrganizationMembership" (
 
 -- CreateTable
 CREATE TABLE "authz"."Role" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "organizationId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
-    "organizationId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
@@ -99,16 +99,16 @@ CREATE TABLE "authz"."Role" (
 
 -- CreateTable
 CREATE TABLE "authz"."RoleInherit" (
-    "id" TEXT NOT NULL,
-    "parentId" TEXT NOT NULL,
-    "childId" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "parentId" INTEGER NOT NULL,
+    "childId" INTEGER NOT NULL,
 
     CONSTRAINT "RoleInherit_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "authz"."Permission" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "action" TEXT NOT NULL,
     "resource" TEXT NOT NULL,
     "description" TEXT,
@@ -119,7 +119,7 @@ CREATE TABLE "authz"."Permission" (
 
 -- CreateTable
 CREATE TABLE "authz"."Policy" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
     "definition" JSONB NOT NULL,
@@ -131,19 +131,19 @@ CREATE TABLE "authz"."Policy" (
 
 -- CreateTable
 CREATE TABLE "authz"."RolePermission" (
-    "id" TEXT NOT NULL,
-    "roleId" TEXT NOT NULL,
-    "permissionId" TEXT NOT NULL,
-    "policyId" TEXT,
+    "id" SERIAL NOT NULL,
+    "roleId" INTEGER NOT NULL,
+    "permissionId" INTEGER NOT NULL,
+    "policyId" INTEGER,
 
     CONSTRAINT "RolePermission_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "authz"."RoleMembership" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "userId" TEXT NOT NULL,
-    "roleId" TEXT NOT NULL,
+    "roleId" INTEGER NOT NULL,
     "organizationId" TEXT,
     "meta" JSONB,
     "assignedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -153,7 +153,7 @@ CREATE TABLE "authz"."RoleMembership" (
 
 -- CreateTable
 CREATE TABLE "audit"."AccessAuditLog" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "userId" TEXT,
     "action" TEXT NOT NULL,
     "resource" TEXT,
@@ -176,6 +176,9 @@ CREATE UNIQUE INDEX "Organization_slug_key" ON "authz"."Organization"("slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "OrganizationMembership_userId_organizationId_key" ON "authz"."OrganizationMembership"("userId", "organizationId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Role_name_organizationId_key" ON "authz"."Role"("name", "organizationId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "RoleInherit_parentId_childId_key" ON "authz"."RoleInherit"("parentId", "childId");
@@ -205,7 +208,7 @@ ALTER TABLE "authz"."OrganizationMembership" ADD CONSTRAINT "OrganizationMembers
 ALTER TABLE "authz"."OrganizationMembership" ADD CONSTRAINT "OrganizationMembership_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "authz"."Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "authz"."Role" ADD CONSTRAINT "Role_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "authz"."Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "authz"."Role" ADD CONSTRAINT "Role_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "authz"."Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "authz"."RoleInherit" ADD CONSTRAINT "RoleInherit_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "authz"."Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

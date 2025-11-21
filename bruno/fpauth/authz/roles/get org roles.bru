@@ -1,16 +1,15 @@
 meta {
-  name: list
+  name: get org roles
   type: http
   seq: 1
 }
 
 get {
-  url: {{baseUrl}}/api/authz/permissions
+  url: {{baseUrl}}/api/authz/roles
   body: none
   auth: inherit
 }
 
 settings {
   encodeUrl: true
-  timeout: 0
 }

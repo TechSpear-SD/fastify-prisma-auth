@@ -97,7 +97,7 @@ model Organization {
 
 // Relation between users and organizations
 model OrganizationMembership {
-  id             String   @id
+  id          Int   @id @default(autoincrement())
   userId         String
   organizationId String
   meta           Json?
@@ -111,10 +111,10 @@ model OrganizationMembership {
 
 // RBAC (roles, permissions, policies)
 model Role {
-  id          String   @id
+  id          Int   @id @default(autoincrement())
+  organizationId String
   name        String
   description String?
-  organizationId String?   // null => global role
   createdAt   DateTime @default(now())
   permissions RolePermission[]
   memberships RoleMembership[]  // users that have this role
@@ -123,14 +123,15 @@ model Role {
   parentRoles RoleInherit[] @relation("ParentRole")
   childRoles RoleInherit[] @relation("ChildRole")
 
+  @@unique([name, organizationId])
   @@schema("authz")
 }
 
 // Relation for role inheritance (role hierarchy)
 model RoleInherit {
-  id        String @id
-  parentId  String
-  childId   String
+  id          Int   @id @default(autoincrement())
+  parentId  Int
+  childId   Int
 
   parent Role @relation("ParentRole", fields:[parentId], references:[id])
   child  Role @relation("ChildRole", fields:[childId], references:[id])
@@ -141,7 +142,7 @@ model RoleInherit {
 
 // This table's content should not be changed on runtime, only via migrations
 model Permission {
-  id          String   @id
+  id          Int   @id @default(autoincrement())
   
   // We dont use a prisma enum but a typescript enum to allow more dynamic permissions   
   // without needing to migrate the database each time a new permission is added
@@ -157,7 +158,7 @@ model Permission {
 }
 
 model Policy {
-  id          String   @id
+  id          Int   @id @default(autoincrement())
   name        String
   description String?
   definition  Json     // JSONLogic / CEL style definition
@@ -172,10 +173,10 @@ model Policy {
 
 // Junction table for Role-Permission with optional Policy constraint
 model RolePermission {
-  id           String   @id
-  roleId       String
-  permissionId String
-  policyId     String?   // optional policy constraint
+  id          Int   @id @default(autoincrement())
+  roleId       Int
+  permissionId Int
+  policyId     Int?   // optional policy constraint
 
   role       Role        @relation(fields:[roleId], references:[id])
   permission Permission  @relation(fields:[permissionId], references:[id])
@@ -187,9 +188,9 @@ model RolePermission {
 
 // Relation between users and roles
 model RoleMembership {
-  id             String @id
+  id          Int   @id @default(autoincrement())
   userId         String
-  roleId         String
+  roleId         Int
   organizationId String? // scope for this role membership, optional
   meta           Json?
   assignedAt     DateTime @default(now())
@@ -203,7 +204,7 @@ model RoleMembership {
 }
 
 model AccessAuditLog {
-  id         String   @id
+  id          Int   @id @default(autoincrement())
   userId     String?
   action     String
   resource   String?

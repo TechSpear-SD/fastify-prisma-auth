@@ -1,8 +1,9 @@
 import { performance } from 'node:perf_hooks';
+import fp from 'fastify-plugin';
 
 import type { FastifyInstance } from 'fastify';
 
-export default async function monitoringPlugin(fastify: FastifyInstance) {
+async function monitoringPlugin(fastify: FastifyInstance) {
     fastify.addHook('onRequest', async (req) => {
         req.startTime = performance.now();
     });
@@ -19,3 +20,5 @@ declare module 'fastify' {
         duration: number;
     }
 }
+
+export default fp(monitoringPlugin, { name: 'monitoring-plugin' });

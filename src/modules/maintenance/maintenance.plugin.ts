@@ -2,6 +2,8 @@ import type { FastifyInstance } from 'fastify';
 import { MaintenanceError } from '../../errors/maintenance-error';
 import { DEFAULT_MODULE_PREFIX, type MaintenancePluginOptions } from '.';
 
+import fp from 'fastify-plugin';
+
 interface MaintenanceState {
     enabled: boolean;
     startTime: Date | null;
@@ -12,10 +14,7 @@ interface MaintenanceState {
  * @param app Fastify instance
  * @param opts Plugin options
  */
-export default async function maintenancePlugin(
-    app: FastifyInstance,
-    opts: MaintenancePluginOptions
-) {
+async function maintenancePlugin(app: FastifyInstance, opts: MaintenancePluginOptions) {
     const state: MaintenanceState = { enabled: false, startTime: null };
 
     app.decorate('maintenance', state);
@@ -43,3 +42,5 @@ declare module 'fastify' {
         maintenance: MaintenanceState;
     }
 }
+
+export default fp(maintenancePlugin, { name: 'maintenance-plugin' });

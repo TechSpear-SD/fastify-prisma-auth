@@ -1,8 +1,10 @@
 import type { FastifyInstance } from 'fastify';
 import { assertUserCan, userCan } from './evaluator';
 import { createRoleService } from './services/role.service';
+import { createPermissionService } from './services/permission.service';
+import fp from 'fastify-plugin';
 
-export default async function authzPlugin(fastify: FastifyInstance) {
+async function authzPlugin(fastify: FastifyInstance) {
     fastify.decorate('authz', {
         can:
             (userId: string) =>
@@ -12,7 +14,8 @@ export default async function authzPlugin(fastify: FastifyInstance) {
             (userId: string) =>
             async (action: string, ctx: any = {}) =>
                 assertUserCan(userId, action, ctx),
-        role: createRoleService(fastify),
+        roles: createRoleService(fastify),
+        permissions: createPermissionService(fastify),
     });
 }
 
@@ -21,6 +24,10 @@ declare module 'fastify' {
         authz: {
             can: (userId: string) => (action: string, ctx?: any) => Promise<boolean>;
             assertCan: (userId: string) => (action: string, ctx?: any) => Promise<void>;
+            roles: ReturnType<typeof createRoleService>;
+            permissions: ReturnType<typeof createPermissionService>;
         };
     }
 }
+
+export default fp(authzPlugin, { name: 'authz-plugin' });

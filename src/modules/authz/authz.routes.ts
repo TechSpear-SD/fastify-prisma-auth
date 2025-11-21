@@ -1,10 +1,11 @@
 import type { FastifyInstance } from 'fastify';
 import { NotImplementedError } from '../../errors/not-implemented.error';
+import { permissionsRoutes } from './routes/permissions.routes';
+import { rolesRoutes } from './routes/role.routes';
 
 export default async function authzRoutes(fastify: FastifyInstance) {
-    fastify.get('/roles', async (request, reply) => {
-        throw new NotImplementedError();
-    });
+    await permissionsRoutes(fastify);
+    await rolesRoutes(fastify);
 
     fastify.post('/roles', async (request, reply) => {
         throw new NotImplementedError();
@@ -19,16 +20,6 @@ export default async function authzRoutes(fastify: FastifyInstance) {
     });
 
     fastify.delete('/roles/:id', async (request, reply) => {
-        throw new NotImplementedError();
-    });
-
-    fastify.get('/permissions', async (request, reply) => {
-        throw new NotImplementedError();
-    });
-    fastify.post('/permissions', async (request, reply) => {
-        throw new NotImplementedError();
-    });
-    fastify.delete('/permissions/:id', async (request, reply) => {
         throw new NotImplementedError();
     });
 

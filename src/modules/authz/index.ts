@@ -7,6 +7,6 @@ import type { AuthzModuleOptions } from './types';
 const DEFAULT_MODULE_PREFIX = '/api/authz';
 
 export const authzModule = fp(async (fastify, opts: AuthzModuleOptions) => {
-    fastify.register(authzPlugin);
-    fastify.register(authzRoutes, { prefix: opts.prefix || DEFAULT_MODULE_PREFIX });
+    await fastify.register(authzPlugin);
+    await fastify.register(authzRoutes, { prefix: opts.prefix || DEFAULT_MODULE_PREFIX });
 });

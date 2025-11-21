@@ -4,25 +4,25 @@ import {
     getRolesResponseSchema200,
     type GetRolesQueryString,
     type GetRolesReply,
-} from '../dto/roles/getRoles.dto';
+} from '../dto/roles/get-roles.dto';
 import {
     postRoleRequestBodySchema,
     postRoleResponseSchema200,
     type PostRoleReply,
     type PostRoleRequestBody,
-} from '../dto/roles/postRole.dto';
+} from '../dto/roles/post-role.dto';
 import {
     deleteRoleRequestParamsSchema,
     deleteRoleResponseSchema204,
     type DeleteRoleReply,
     type DeleteRoleRequestParams,
-} from '../dto/roles/deleteRole';
+} from '../dto/roles/delete-role';
 import {
     getRoleByIdRequestParamsSchema,
     getRoleByIdResponseSchema200,
     type GetRoleByIdReply,
     type GetRoleByIdRequestParams,
-} from '../dto/roles/getRoleById.dto';
+} from '../dto/roles/get-role-by-id.dto';
 
 import {
     patchRoleRequestBodySchema,
@@ -31,7 +31,13 @@ import {
     type PatchRoleReply,
     type PatchRoleRequestBody,
     type PatchRoleRequestParams,
-} from '../dto/roles/patchRole';
+} from '../dto/roles/patch-role';
+import {
+    getRoleMembersRequestParamsSchema,
+    getRoleMembersResponseSchema200,
+    type GetRoleMembersReply,
+    type GetRoleMembersRequestParams,
+} from '../dto/roles/get-role-members';
 
 export async function rolesRoutes(fastify: FastifyInstance) {
     // Get all roles for an organization
@@ -142,6 +148,29 @@ export async function rolesRoutes(fastify: FastifyInstance) {
             await fastify.authz.roles.patchRole(roleId, name, description);
 
             return reply.code(204).send();
+        }
+    );
+
+    fastify.get<{ Params: GetRoleMembersRequestParams; Reply: GetRoleMembersReply }>(
+        '/roles/:roleId/members',
+        {
+            schema: {
+                params: getRoleMembersRequestParamsSchema,
+                response: {
+                    200: getRoleMembersResponseSchema200,
+                },
+            },
+        },
+        async (request, reply) => {
+            const { roleId } = request.params as { roleId: number };
+            const members = await fastify.authz.roleMemberships.getRoleMembers(roleId);
+            return reply.code(200).send(
+                members.map((member) => ({
+                    ...member,
+                    createdAt: member.createdAt.toISOString(),
+                    updatedAt: member.updatedAt.toISOString(),
+                }))
+            );
         }
     );
 }

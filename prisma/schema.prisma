@@ -90,7 +90,6 @@ model Organization {
   // relations
   users       OrganizationMembership[]
   roles       Role[]
-  roleMemberships RoleMembership[]
 
   @@schema("authz")
 }
@@ -191,15 +190,13 @@ model RoleMembership {
   id          Int   @id @default(autoincrement())
   userId         String
   roleId         Int
-  organizationId String? // scope for this role membership, optional
   meta           Json?
   assignedAt     DateTime @default(now())
 
   user User @relation(fields:[userId], references:[id])
   role Role @relation(fields:[roleId], references:[id])
-  organization Organization? @relation(fields:[organizationId], references:[id])
 
-  @@unique([userId, roleId, organizationId])
+  @@unique([userId, roleId])
   @@schema("authz")
 }
 

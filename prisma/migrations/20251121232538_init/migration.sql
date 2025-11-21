@@ -144,7 +144,6 @@ CREATE TABLE "authz"."RoleMembership" (
     "id" SERIAL NOT NULL,
     "userId" TEXT NOT NULL,
     "roleId" INTEGER NOT NULL,
-    "organizationId" TEXT,
     "meta" JSONB,
     "assignedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -193,7 +192,7 @@ CREATE UNIQUE INDEX "Policy_name_organizationId_key" ON "authz"."Policy"("name",
 CREATE UNIQUE INDEX "RolePermission_roleId_permissionId_key" ON "authz"."RolePermission"("roleId", "permissionId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "RoleMembership_userId_roleId_organizationId_key" ON "authz"."RoleMembership"("userId", "roleId", "organizationId");
+CREATE UNIQUE INDEX "RoleMembership_userId_roleId_key" ON "authz"."RoleMembership"("userId", "roleId");
 
 -- AddForeignKey
 ALTER TABLE "core"."session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "core"."user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -230,9 +229,6 @@ ALTER TABLE "authz"."RoleMembership" ADD CONSTRAINT "RoleMembership_userId_fkey"
 
 -- AddForeignKey
 ALTER TABLE "authz"."RoleMembership" ADD CONSTRAINT "RoleMembership_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "authz"."Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "authz"."RoleMembership" ADD CONSTRAINT "RoleMembership_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "authz"."Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "audit"."AccessAuditLog" ADD CONSTRAINT "AccessAuditLog_userId_fkey" FOREIGN KEY ("userId") REFERENCES "core"."user"("id") ON DELETE SET NULL ON UPDATE CASCADE;

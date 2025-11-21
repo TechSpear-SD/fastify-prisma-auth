@@ -3,6 +3,7 @@ import { assertUserCan, userCan } from './evaluator';
 import { createRoleService } from './services/role.service';
 import { createPermissionService } from './services/permission.service';
 import fp from 'fastify-plugin';
+import { createRoleMembershipService } from './services/role-membership.service';
 
 async function authzPlugin(fastify: FastifyInstance) {
     fastify.decorate('authz', {
@@ -16,6 +17,7 @@ async function authzPlugin(fastify: FastifyInstance) {
                 assertUserCan(userId, action, ctx),
         roles: createRoleService(fastify),
         permissions: createPermissionService(fastify),
+        roleMemberships: createRoleMembershipService(fastify),
     });
 }
 
@@ -26,6 +28,7 @@ declare module 'fastify' {
             assertCan: (userId: string) => (action: string, ctx?: any) => Promise<void>;
             roles: ReturnType<typeof createRoleService>;
             permissions: ReturnType<typeof createPermissionService>;
+            roleMemberships: ReturnType<typeof createRoleMembershipService>;
         };
     }
 }

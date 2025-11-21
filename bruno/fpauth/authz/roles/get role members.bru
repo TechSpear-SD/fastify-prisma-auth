@@ -1,11 +1,11 @@
 meta {
-  name: get role by id
+  name: get role members
   type: http
-  seq: 4
+  seq: 6
 }
 
 get {
-  url: {{baseUrl}}/api/authz/roles/:roleId
+  url: {{baseUrl}}/api/authz/roles/:roleId/members
   body: none
   auth: inherit
 }

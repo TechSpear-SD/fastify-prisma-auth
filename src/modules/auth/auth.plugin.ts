@@ -1,8 +1,9 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import type { FastifyInstance } from 'fastify';
+import fp from 'fastify-plugin';
 
-export default async function authPlugin(fastify: FastifyInstance) {
+async function authPlugin(fastify: FastifyInstance) {
     const auth = betterAuth({
         database: prismaAdapter(fastify.prisma, {
             provider: 'postgresql',
@@ -49,3 +50,5 @@ declare module 'fastify' {
         auth: ReturnType<typeof betterAuth>;
     }
 }
+
+export default fp(authPlugin, { name: 'auth-plugin' });

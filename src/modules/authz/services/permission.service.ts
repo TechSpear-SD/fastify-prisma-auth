@@ -2,7 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import type { PermissionAction } from '../permission-action';
 
 export const createPermissionService = (fastify: FastifyInstance) => ({
-    getPermissionById: async (id: string) => {
+    getPermissionById: async (id: number) => {
         return fastify.prisma.permission.findUniqueOrThrow({
             where: { id },
         });

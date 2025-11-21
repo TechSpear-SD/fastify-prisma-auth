@@ -1,41 +1,22 @@
 import type { FastifyInstance } from 'fastify';
 
-export const createRoleMembershipService = (fastify: FastifyInstance) => ({});
-
-// /**
-//  * Returns all role memberships for a user
-//  *
-//  * @param userId
-//  * @returns
-//  */
-// export async function getUserRoleMemberships(userId: string) {
-//     return prisma.roleMembership.findMany({
-//         where: { userId },
-//         include: {
-//             role: {
-//                 include: {
-//                     permissions: {
-//                         include: {
-//                             permission: true,
-//                             policy: true,
-//                         },
-//                     },
-//                     parentRoles: {
-//                         include: {
-//                             parent: {
-//                                 include: {
-//                                     permissions: {
-//                                         include: {
-//                                             permission: true,
-//                                             policy: true,
-//                                         },
-//                                     },
-//                                 },
-//                             },
-//                         },
-//                     },
-//                 },
-//             },
-//         },
-//     });
-// }
+export const createRoleMembershipService = (fastify: FastifyInstance) => ({
+    getRoleMembers: async (roleId: number) => {
+        const members = await fastify.prisma.roleMembership.findMany({
+            where: { roleId },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        image: true,
+                    },
+                },
+            },
+        });
+        return members.map((member) => member.user);
+    },
+});

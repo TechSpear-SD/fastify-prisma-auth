@@ -38,6 +38,14 @@ import {
     type GetRoleMembersReply,
     type GetRoleMembersRequestParams,
 } from '../dto/roles/get-role-members';
+import {
+    postRoleMembershipBodySchema,
+    postRoleMembershipParamsSchema,
+    postRoleMembershipResponseSchema201,
+    type PostRoleMembershipReply,
+    type PostRoleMembershipRequestBody,
+    type PostRoleMembershipRequestParams,
+} from '../dto/roles/add-role-membership';
 
 export async function rolesRoutes(fastify: FastifyInstance) {
     // Get all roles for an organization
@@ -173,6 +181,31 @@ export async function rolesRoutes(fastify: FastifyInstance) {
             );
         }
     );
+
+    fastify.post<{
+        Params: PostRoleMembershipRequestParams;
+        Body: PostRoleMembershipRequestBody;
+        Reply: PostRoleMembershipReply;
+    }>(
+        '/roles/:roleId/members',
+        {
+            schema: {
+                params: postRoleMembershipParamsSchema,
+                body: postRoleMembershipBodySchema,
+                response: {
+                    201: postRoleMembershipResponseSchema201,
+                },
+            },
+        },
+        async (request, reply) => {
+            const { roleId } = request.params;
+            const { userId } = request.body;
+
+            await fastify.authz.roleMemberships.createRoleMembership(roleId, userId);
+
+            return reply.code(201).send();
+        }
+    );
 }
 
 /**
@@ -180,9 +213,9 @@ export async function rolesRoutes(fastify: FastifyInstance) {
 
 Role Membership (gestion des utilisateurs assignés au rôle)
 
-GET /roles/:roleId/members – Liste les utilisateurs associés au rôle.
+GET /roles/:roleId/members – Liste les utilisateurs associés au rôle. : OK
 
-POST /roles/:roleId/members – Associe un utilisateur au rôle.
+POST /roles/:roleId/members – Associe un utilisateur au rôle. : OK
 
 DELETE /roles/:roleId/members/:userId – Retire un utilisateur du rôle.
 

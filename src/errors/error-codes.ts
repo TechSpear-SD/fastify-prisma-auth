@@ -6,4 +6,5 @@ export enum ErrorCodes {
     VALIDATION = 'VALIDATION',
     ALREADY_EXISTS = 'ALREADY_EXISTS',
     NOT_FOUND = 'NOT_FOUND',
+    BAD_REQUEST = 'BAD_REQUEST',
 }

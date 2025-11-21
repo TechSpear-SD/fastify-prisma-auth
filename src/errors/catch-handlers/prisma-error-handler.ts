@@ -58,6 +58,21 @@ export function prismaCatchHandler(err: FastifyError): CustomError | undefined {
             });
         }
 
+        if (parsedError.code === 'P2003') {
+            return new DatabaseError(
+                'Foreign key constraint violation',
+                ErrorCodes.BAD_REQUEST,
+                undefined,
+                {
+                    originalError: {
+                        name: parsedError.name,
+                        code: parsedError.code,
+                        message: parsedError.message,
+                    },
+                }
+            );
+        }
+
         /**
          * Handle other known PrismaClientKnownRequestError.
          */

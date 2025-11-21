@@ -19,4 +19,13 @@ export const createRoleMembershipService = (fastify: FastifyInstance) => ({
         });
         return members.map((member) => member.user);
     },
+
+    createRoleMembership: async (roleId: number, userId: string) => {
+        await fastify.prisma.roleMembership.create({
+            data: {
+                roleId,
+                userId,
+            },
+        });
+    },
 });

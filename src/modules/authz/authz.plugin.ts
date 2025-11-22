@@ -1,10 +1,11 @@
 import type { FastifyInstance } from 'fastify';
-import { assertUserCan, userCan } from './evaluator';
+import { assertUserCan, userCan } from './abac-evaluator';
 import { createRoleService } from './services/role.service';
 import { createPermissionService } from './services/permission.service';
 import fp from 'fastify-plugin';
 import { createRoleMembershipService } from './services/role-membership.service';
 import { createRolePermissionService } from './services/role-permission.service';
+import { createOrganizationMembershipService } from './services/organization-membership.service';
 
 async function authzPlugin(fastify: FastifyInstance) {
     fastify.decorate('authz', {
@@ -20,6 +21,7 @@ async function authzPlugin(fastify: FastifyInstance) {
         permissions: createPermissionService(fastify),
         roleMemberships: createRoleMembershipService(fastify),
         rolePermissions: createRolePermissionService(fastify),
+        organizationMemberships: createOrganizationMembershipService(fastify),
     });
 }
 
@@ -32,6 +34,7 @@ declare module 'fastify' {
             permissions: ReturnType<typeof createPermissionService>;
             roleMemberships: ReturnType<typeof createRoleMembershipService>;
             rolePermissions: ReturnType<typeof createRolePermissionService>;
+            organizationMemberships: ReturnType<typeof createOrganizationMembershipService>;
         };
     }
 }

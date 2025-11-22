@@ -5,16 +5,17 @@ meta {
 }
 
 delete {
-  url: {{baseUrl}}/api/authz/roles/:roleId/members/:userid
+  url: {{baseUrl}}/api/authz/roles/:roleId/members/:userId
   body: none
   auth: inherit
 }
 
 params:path {
-  roleId: 
-  userid: 
+  userId: a
+  roleId: 1
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

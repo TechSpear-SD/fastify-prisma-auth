@@ -1,0 +1,94 @@
+import type { FastifyInstance } from 'fastify';
+import {
+    getOrganizationMembersRequestParamsSchema,
+    getOrganizationMembersResponseSchema200,
+    type GetOrganizationMembersReply,
+    type GetOrganizationMembersRequestParams,
+} from '../dto/organization/get-organization-members.dto';
+import {
+    postOrganizationMembershipBodySchema,
+    postOrganizationMembershipParamsSchema,
+    postOrganizationMembershipResponseSchema201,
+    type PostOrganizationMembershipReply,
+    type PostOrganizationMembershipRequestBody,
+    type PostOrganizationMembershipRequestParams,
+} from '../dto/organization/post-organization-membership';
+import {
+    deleteOrganizationMembershipRequestParamsSchema,
+    deleteOrganizationMembershipResponseSchema204,
+    type DeleteOrganizationMembershipReply,
+    type DeleteOrganizationMembershipRequestParams,
+} from '../dto/organization/delete-organization-membership.dto';
+
+export async function organizationRoutes(fastify: FastifyInstance) {
+    fastify.get<{
+        Params: GetOrganizationMembersRequestParams;
+        Reply: GetOrganizationMembersReply;
+    }>(
+        '/organizations/:organizationId/members',
+        {
+            schema: {
+                params: getOrganizationMembersRequestParamsSchema,
+                response: { 200: getOrganizationMembersResponseSchema200 },
+            },
+        },
+        async (request, reply) => {
+            const { organizationId } = request.params as { organizationId: string };
+            const members =
+                await fastify.authz.organizationMemberships.getOrganizationMembers(organizationId);
+            return reply.code(200).sendWithDates(members);
+        }
+    );
+
+    fastify.post<{
+        Params: PostOrganizationMembershipRequestParams;
+        Body: PostOrganizationMembershipRequestBody;
+        Reply: PostOrganizationMembershipReply;
+    }>(
+        '/organizations/:organizationId/members',
+        {
+            schema: {
+                params: postOrganizationMembershipParamsSchema,
+                body: postOrganizationMembershipBodySchema,
+                response: { 201: postOrganizationMembershipResponseSchema201 },
+            },
+        },
+        async (request, reply) => {
+            const { organizationId } = request.params as { organizationId: string };
+            const { userId } = request.body as { userId: string };
+            await fastify.authz.organizationMemberships.createOrganizationMembership(
+                organizationId,
+                userId
+            );
+
+            return reply.code(201).send();
+        }
+    );
+
+    fastify.delete<{
+        Params: DeleteOrganizationMembershipRequestParams;
+        Reply: DeleteOrganizationMembershipReply;
+    }>(
+        '/organizations/:organizationId/members/:userId',
+        {
+            schema: {
+                params: deleteOrganizationMembershipRequestParamsSchema,
+                response: {
+                    204: deleteOrganizationMembershipResponseSchema204,
+                },
+            },
+        },
+        async (request, reply) => {
+            const { organizationId, userId } = request.params as {
+                organizationId: string;
+                userId: string;
+            };
+            await fastify.authz.organizationMemberships.deleteOrganizationMembership(
+                organizationId,
+                userId
+            );
+
+            return reply.code(204).send();
+        }
+    );
+}

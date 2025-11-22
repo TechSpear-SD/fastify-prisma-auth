@@ -22,7 +22,7 @@ model User {
   accounts      Account[]
 
   // Modules relations
-  memberships   RoleMembership[]
+  roleMemberships   RoleMembership[]
   organizationMemberships OrganizationMembership[]
   auditLogs     AccessAuditLog[]
 

@@ -3,7 +3,7 @@ import type { FromSchema } from 'json-schema-to-ts';
 export const getPermissionByIdParamSchema = {
     type: 'object',
     properties: {
-        permissionId: { type: 'string' },
+        permissionId: { type: 'number' },
     },
     required: ['permissionId'],
 } as const;
@@ -11,7 +11,7 @@ export const getPermissionByIdParamSchema = {
 export const getPermissionByIdResponseSchema200 = {
     type: 'object',
     properties: {
-        id: { type: 'string' },
+        id: { type: 'number' },
         action: { type: 'string' },
         resource: { type: 'string' },
         description: { type: ['string', 'null'] },

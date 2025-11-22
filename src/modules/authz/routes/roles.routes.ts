@@ -16,7 +16,7 @@ import {
     deleteRoleResponseSchema204,
     type DeleteRoleReply,
     type DeleteRoleRequestParams,
-} from '../dto/roles/delete-role';
+} from '../dto/roles/delete-role.dto';
 import {
     getRoleByIdRequestParamsSchema,
     getRoleByIdResponseSchema200,
@@ -31,13 +31,13 @@ import {
     type PatchRoleReply,
     type PatchRoleRequestBody,
     type PatchRoleRequestParams,
-} from '../dto/roles/patch-role';
+} from '../dto/roles/patch-role.dto';
 import {
     getRoleMembersRequestParamsSchema,
     getRoleMembersResponseSchema200,
     type GetRoleMembersReply,
     type GetRoleMembersRequestParams,
-} from '../dto/roles/get-role-members';
+} from '../dto/roles/get-role-members.dto';
 import {
     postRoleMembershipBodySchema,
     postRoleMembershipParamsSchema,
@@ -45,13 +45,33 @@ import {
     type PostRoleMembershipReply,
     type PostRoleMembershipRequestBody,
     type PostRoleMembershipRequestParams,
-} from '../dto/roles/add-role-membership';
+} from '../dto/roles/add-role-membership.dto';
 import {
     deleteRoleMembershipRequestParamsSchema,
     deleteRoleMembershipResponseSchema204,
-    type deleteRoleMembershipReply,
-    type deleteRoleMembershipRequestParams,
-} from '../dto/roles/delete-role-membership';
+    type DeleteRoleMembershipReply,
+    type DeleteRoleMembershipRequestParams,
+} from '../dto/roles/delete-role-membership.dto';
+import {
+    getRolePermissionsRequestParamsSchema,
+    getRolePermissionsResponseSchema200,
+    type GetRolePermissionsReply,
+    type GetRolePermissionsRequestParams,
+} from '../dto/roles/get-role-permissions.dto';
+import {
+    postRolePermissionBodySchema,
+    postRolePermissionParamsSchema,
+    postRolePermissionResponseSchema201,
+    type PostRolePermissionReply,
+    type PostRolePermissionRequestBody,
+    type PostRolePermissionRequestParams,
+} from '../dto/roles/post-role-permission.dto';
+import {
+    deleteRolePermissionRequestParamsSchema,
+    deleteRolePermissionResponseSchema204,
+    type DeleteRolePermissionReply,
+    type DeleteRolePermissionRequestParams,
+} from '../dto/roles/delete-role-permission.dto';
 
 export async function rolesRoutes(fastify: FastifyInstance) {
     // Get all roles for an organization
@@ -213,7 +233,7 @@ export async function rolesRoutes(fastify: FastifyInstance) {
         }
     );
 
-    fastify.delete<{ Params: deleteRoleMembershipRequestParams; Reply: deleteRoleMembershipReply }>(
+    fastify.delete<{ Params: DeleteRoleMembershipRequestParams; Reply: DeleteRoleMembershipReply }>(
         '/roles/:roleId/members/:userId',
         {
             schema: {
@@ -229,38 +249,64 @@ export async function rolesRoutes(fastify: FastifyInstance) {
             return reply.code(204).send();
         }
     );
+
+    fastify.get<{ Params: GetRolePermissionsRequestParams; Reply: GetRolePermissionsReply }>(
+        '/roles/:roleId/permissions',
+        {
+            schema: {
+                params: getRolePermissionsRequestParamsSchema,
+                response: {
+                    200: getRolePermissionsResponseSchema200,
+                },
+            },
+        },
+        async (request, reply) => {
+            const { roleId } = request.params;
+            const permissions = await fastify.authz.rolePermissions.getRolePermissions(roleId);
+            return reply.code(200).send(
+                permissions.map((permission) => ({
+                    ...permission,
+                    createdAt: permission.createdAt.toISOString(),
+                }))
+            );
+        }
+    );
+
+    fastify.post<{
+        Params: PostRolePermissionRequestParams;
+        Body: PostRolePermissionRequestBody;
+        Reply: PostRolePermissionReply;
+    }>(
+        '/roles/:roleId/permissions',
+        {
+            schema: {
+                params: postRolePermissionParamsSchema,
+                body: postRolePermissionBodySchema,
+                response: {
+                    201: postRolePermissionResponseSchema201,
+                },
+            },
+        },
+        async (request, reply) => {
+            const { roleId } = request.params;
+            const { permissionId } = request.body;
+            await fastify.authz.rolePermissions.createRolePermission(roleId, permissionId);
+            return reply.code(201).send();
+        }
+    );
+
+    fastify.delete<{ Params: DeleteRolePermissionRequestParams; Reply: DeleteRolePermissionReply }>(
+        '/roles/:roleId/permissions/:permissionId',
+        {
+            schema: {
+                params: deleteRolePermissionRequestParamsSchema,
+                response: { 204: deleteRolePermissionResponseSchema204 },
+            },
+        },
+        async (request, reply) => {
+            const { roleId, permissionId } = request.params;
+            await fastify.authz.rolePermissions.deleteRolePermission(roleId, permissionId);
+            return reply.code(204).send();
+        }
+    );
 }
-
-/**
- * 
-
-Role Membership (gestion des utilisateurs assignés au rôle)
-
-GET /roles/:roleId/members – Liste les utilisateurs associés au rôle. : OK
-
-POST /roles/:roleId/members – Associe un utilisateur au rôle. : OK
-
-DELETE /roles/:roleId/members/:userId – Retire un utilisateur du rôle.
-
-Role Permissions (gestion des permissions du rôle)
-
-GET /roles/:roleId/permissions – Liste les permissions attachées au rôle.
-
-POST /roles/:roleId/permissions – Ajoute une permission au rôle.
-
-DELETE /roles/:roleId/permissions/:permissionId – Retire une permission du rôle.
-
-Role Hierarchy (héritage entre rôles)
-
-GET /roles/:roleId/parents – Liste les rôles dont ce rôle hérite.
-
-POST /roles/:roleId/parents – Ajoute un rôle parent (héritage).
-
-DELETE /roles/:roleId/parents/:parentRoleId – Retire un rôle parent.
-
-GET /roles/:roleId/children – Liste les rôles qui héritent de ce rôle.
-
-POST /roles/:roleId/children – Ajoute un rôle enfant.
-
-DELETE /roles/:roleId/children/:childRoleId – Retire un rôle enfant.
- */

@@ -15,12 +15,12 @@ export const deleteRoleMembershipResponseSchema204 = {
     required: [],
 } as const;
 
-export type deleteRoleMembershipRequestParams = FromSchema<
+export type DeleteRoleMembershipRequestParams = FromSchema<
     typeof deleteRoleMembershipRequestParamsSchema
 >;
-type deleteRoleMembershipResponseSchema204 = FromSchema<
+type DeleteRoleMembershipResponseSchema204 = FromSchema<
     typeof deleteRoleMembershipResponseSchema204
 >;
-export type deleteRoleMembershipReply = {
-    204: deleteRoleMembershipResponseSchema204;
+export type DeleteRoleMembershipReply = {
+    204: DeleteRoleMembershipResponseSchema204;
 };

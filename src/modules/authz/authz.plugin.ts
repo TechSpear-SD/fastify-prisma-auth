@@ -4,6 +4,7 @@ import { createRoleService } from './services/role.service';
 import { createPermissionService } from './services/permission.service';
 import fp from 'fastify-plugin';
 import { createRoleMembershipService } from './services/role-membership.service';
+import { createRolePermissionService } from './services/role-permission.service';
 
 async function authzPlugin(fastify: FastifyInstance) {
     fastify.decorate('authz', {
@@ -18,6 +19,7 @@ async function authzPlugin(fastify: FastifyInstance) {
         roles: createRoleService(fastify),
         permissions: createPermissionService(fastify),
         roleMemberships: createRoleMembershipService(fastify),
+        rolePermissions: createRolePermissionService(fastify),
     });
 }
 
@@ -29,6 +31,7 @@ declare module 'fastify' {
             roles: ReturnType<typeof createRoleService>;
             permissions: ReturnType<typeof createPermissionService>;
             roleMemberships: ReturnType<typeof createRoleMembershipService>;
+            rolePermissions: ReturnType<typeof createRolePermissionService>;
         };
     }
 }
